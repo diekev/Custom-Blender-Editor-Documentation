@@ -3,8 +3,9 @@ Custom Editor Support in Blender
 
 In Blender an editor is made from a Space, which can contain one or more Regions.
 The regions can be the header, footer, UI (colloquially referred to as the side-bar), etc.
+The regions are responsible to display data and properties to the user.
 
-This document if for documentation purposes only, it will not create a usable editor
+This document is for documentation purposes only, it will not create a usable editor
 in Blender.
 
 Creating a Space
@@ -34,16 +35,16 @@ class MyEditor(bpy.types.Space):
     # Optional: search_filter_get
     # If you want to add support to find properties within panels in your
     # editor, you can define this function. You are in charge of displaying
-    # to the user a text box to enter a query string.
+    # to the user a text box to enter the query string.
     def search_filter_get(self):
         return self.query_string
 
 
     # Optional: eyedropper_color_sample
-    # If your editor displays images in non-linear color spaces, or using some
-    # after effects, it can be a good thing to implement a way to sample colors
-    # with the eyedropper without the color management or effects. This is what
-    # this method is about.
+    # If, for example, your editor displays images in non-linear color spaces,
+    # or using some after effects, it can be a good thing to implement a way to
+    # sample colors with the eyedropper without the color management or effects.
+    # This is what this method is about.
     # If you do not implement this, users can still use the eyedropper in your
     # editor, but the sampled color might not be what they wished for.
     #
