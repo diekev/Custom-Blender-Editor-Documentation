@@ -210,7 +210,7 @@ class MyHeaderRegionUI(bpy.types.Header):
         layout = self.layout
 
         # Access the editor if need be.
-        # editeur = context.space_data
+        editor = context.space_data
 
         # Displays the editor selection drop-down menu.
         layout.template_header()
@@ -220,7 +220,7 @@ class MyHeaderRegionUI(bpy.types.Header):
 
         # Displays an input for the query string.
         layout.separator_spacer()
-        layout.prop(editeur, "query_string", icon='VIEWZOOM', text="")
+        layout.prop(editor, "query_string", icon='VIEWZOOM', text="")
         layout.separator_spacer()
 ```
 
@@ -256,9 +256,9 @@ class MY_EDITOR_TYPE_MT_view_menu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        editeur = context.space_data
+        editor = context.space_data
 
-        layout.prop(editeur, "show_region_ui")
+        layout.prop(editor, "show_region_ui")
 ```
 
 Editor Menus
