@@ -209,7 +209,7 @@ class MyHeaderRegionUI(bpy.types.Header):
     def draw(self, context):
         layout = self.layout
 
-        # Access the editor if need be.
+        # Access the editor.
         editor = context.space_data
 
         # Displays the editor selection drop-down menu.
