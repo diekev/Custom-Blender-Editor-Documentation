@@ -1,0 +1,11 @@
+To-do's
+-------
+
+- Expose grid view (e.g. spreadsheet) and tree view (e.g. outliner) widgets to the API
+- Drag & drop support (hard)
+- Better UIList widget, with multiple selection support (possibly via a new type)
+
+Known Issues
+------------
+
+- Saving a file with multiple custom editors after unregistering one of them messes up the data.

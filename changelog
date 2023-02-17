@@ -1,0 +1,17 @@
+6 November 2022
+---------------
+
+Original publication
+
+
+?? February 2023
+----------------
+
+- Allow custom editors to be accessed via `bpy.types`
+- Allow custom regions to inherit default keymaps (e.g. for gizmos or grease pencil)
+- Add contextual listeners to Spaces and Regions
+- Fix crash switching general keymaps settings.
+- Fix crashes when unregistering space types at runtime.
+- Fix crash when switching between different custom spaces in the same area
+- Fix memory leak and data loss when switching between different custom spaces in the same area
+- Fix memory leak happening when running unit tests.

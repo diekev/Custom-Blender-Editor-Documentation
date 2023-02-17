@@ -8,6 +8,8 @@ The regions are responsible to display data and properties to the user.
 This document is for documentation purposes only, it will not create a usable editor
 in Blender.
 
+[The code can be found by clicking here, branch "custom_space_type".](https://github.com/diekev/blender)
+
 Creating a Space
 ----------------
 
@@ -69,6 +71,26 @@ class MyEditor(bpy.types.Space):
     # at the bottom of this file).
     def editor_menus_idname(self):
         return MY_EDITOR_TYPE_MT_editor_menus.bl_idname
+
+
+    # Optional: listener
+    # This can be used to handled notifications from built-in operators which
+    # modified the context in some way. For example, when a CacheFile is created
+    # or an object selected.
+    # This will be called for each area containing an instance of the Space.
+    #
+    # Params:
+    #   cls: the class type
+    #   window: the window where the notification is dispatched
+    #   area: the current area (bpy.types.Area) being visited
+    #   scene: the current scene
+    #   note: the bpy.types.Notifier (see below) which describes the change
+    @classmethod
+    def listener(cls, window, area, scene, note):
+        if note.category == 'SCENE':
+            # Redraw the area if the active object or the view layers have changed.
+            if note.data in ['OB_ACTIVE', 'LAYER']:
+                area.tag_redraw()
 ```
 
 Adding a Keymap
@@ -193,6 +215,28 @@ class MyEditorRegion(bpy.types.Region):
 
         # Finally, if you support gizmos, you should draw them.
         self.gizmos_draw(context)
+
+    
+    # Optional: listener
+    # This can be used to handled notifications from built-in operators which
+    # modified the context in some way. For example, when a CacheFile is created
+    # or an object selected.
+    # This will be called for each instance of the Region.
+    #
+    # Params:
+    #   cls: the class type
+    #   window: the window where the notification is dispatched
+    #   area: the current area (bpy.types.Area) being visited, this can be null if
+    #         the region is not part of an area 
+    #   region: the current region being visited
+    #   scene: the current scene
+    #   note: the bpy.types.Notifier (see below) which describes the change
+    @classmethod
+    def listener(cls, window, area, region, scene, note):
+        if note.category == 'SCENE':
+            # Redraw the region if the active object or the view layers have changed.
+            if note.data in ['OB_ACTIVE', 'LAYER']:
+                region.tag_redraw()
 ```
 
 UI for Headers and Footers
@@ -274,3 +318,255 @@ class MY_EDITOR_TYPE_MT_editor_menus(bpy.types.Menu):
         # Menus here will be accessible from the search menu operator (F3).
         layout.menu("MY_EDITOR_TYPE_MT_view_menu")
 ```
+
+Notifiers (bpy.types.Notifier)
+------------------------------
+
+Notifiers hold data describing where a change happened and what has changed.
+
+### Properties
+
+#### category (Notifier.category)
+
+Enumeration, describe which parent type (e.g. ID, Space, Window Manager) where the change occured.
+
+Possible values :
+
+| Name | Relates to |
+|:----------|:--------------------|
+| WM | the Window Manager |
+| WINDOW | the Window |
+| WORKSPACE | the Workspace |
+| SCREEN | a Screen ID |
+| SCENE | the Scene |
+| OBJECT | an Object ID |
+| MATERIAL | a Material ID |
+| TEXTURE | a Texture ID |
+| LAMP | a light object |
+| COLLECTION | a Collection ID |
+| IMAGE | an Image ID |
+| BRUSH | a Brush ID |
+| TEXT | a Text ID |
+| WORLD | a World ID |
+| ANIMATION | animation data |
+| SPACE | a Space |
+| GEOM | geometry data |
+| NODE | a Node or the node editor |
+| ID | some ID |
+| PAINT_CURVE | a paint curve |
+| MOVIE_CLIP | a Movie Clip ID |
+| MASK | a Mask ID |
+| GREASE_PENCIL | a Grease Pencil object |
+| LINESTYLE | a Line Style object |
+| CAMERA | a Camera object |
+| LIGHTPROBE | a light probe |
+| ASSET | an Asset ID |
+| VIEWER_PATH | a viewer path |
+
+In some cases, the category can be confusing. For example, if an object is added, then the category is 'SCENE' and not 'OBJECT' as the Scene has a new object.
+
+#### subtype (Notifier.subtype)
+
+Enumeration, gives a precision to the category.
+
+| Name | Description |
+|:----------|:--------------------|
+| MODE_OBJECT | Changed happened in object mode |
+| EDITMODE_MESH | Changed happened in the edit mode of a Mesh object |
+| EDITMODE_CURVE | Changed happened in the edit mode of a legacy Curve object |
+| EDITMODE_CURVES | Changed happened in the edit mode of a Curves object |
+| EDITMODE_SURFACE | Changed happened in the edit mode of a NURBS object |
+| EDITMODE_TEXT | Changed happened in the edit mode of a Text object |
+| EDITMODE_MBALL | Changed happened in the edit mode of a Meta Ball object |
+| EDITMODE_LATTICE | Changed happened in the edit mode of a Lattice object |
+| EDITMODE_ARMATURE | Changed happened in the edit mode of an Armature object |
+| MODE_POSE | Changed happened in Pose mode |
+| MODE_PARTICLE | Changed happened in Particles edit mode |
+| VIEW3D_GPU | Changed happened when the 3D view was being drawn regularly |
+| VIEW3D_SHADING | Changed happened when the 3D view was being rendered in preview |
+| LAYER_COLLECTION | Changed happened when editing a view layer |
+
+#### action (Notifier.action)
+
+Enumeration, the action being performed.
+
+| Name | Description |
+|:----------|:--------------------|
+| EDITED | Something was edited |
+| EVALUATED | Something was evaluated |
+| ADDED | Something was added |
+| REMOVED | Something was removed |
+| RENAME | Something was renamed |
+| SELECTED | Something was evaluated |
+| ACTIVATED | Something was set as active |
+| PAINTING | Something was painted on |
+| JOB_FINISHED | A job finished (e.g. a bake, the loading of an Alembic file is done) |
+
+#### data (Notifier.data)
+
+Enumeration, the data which was modified.
+
+The possible values for the data depend on which category the changed happened in. Some categories have no data, and therefore for those the only value is 'NONE'.
+
+If category is 'WM'.
+
+| Name | Description |
+|:----------|:--------------------|
+| FILEREAD | |
+| FILESAVE | |
+| DATACHANGED | |
+| HISTORY | |
+| JOB | |
+| UNDO | |
+| XR_DATA_CHANGED | |
+| LIB_OVERRIDE_CHANGED | |
+
+If category is 'SCREEN'.
+
+| Name | Description |
+|:----------|:--------------------|
+| LAYOUTBROWSE | |
+| LAYOUTDELETE | |
+| ANIMPLAY | |
+| GPENCIL | |
+| LAYOUTSET | |
+| SKETCH | |
+| WORKSPACE_SET | |
+| WORKSPACE_DELETE | |
+
+If category is 'SCENE'.
+
+| Name | Description |
+|:----------|:--------------------|
+| SCENEBROWSE | |
+| MARKERS | |
+| FRAME | |
+| RENDER_OPTIONS | |
+| NODES | |
+| SEQUENCER | |
+| OB_ACTIVE | |
+| OB_SELECT | |
+| OB_VISIBLE | |
+| OB_RENDER | |
+| MODE | |
+| RENDER_RESULT | |
+| COMPO_RESULT | |
+| KEYINGSET | |
+| TOOLSETTINGS | |
+| LAYER | |
+| FRAME_RANGE | |
+| TRANSFORM_DONE | |
+| WORLD | |
+| LAYER_CONTENT | |
+
+If category is 'OBJECT'.
+
+| Name | Description |
+|:----------|:--------------------|
+| TRANSFORM | |
+| OB_SHADING | |
+| POSE | |
+| BONE_ACTIVE | |
+| BONE_SELECT | |
+| DRAW | |
+| MODIFIER | |
+| KEYS | |
+| CONSTRAINT | |
+| PARTICLE | |
+| POINTCACHE | |
+| PARENT | |
+| LOD | |
+| DRAW_RENDER_VIEWPORT | |
+| SHADERFX | |
+| DRAW_ANIMVIZ | |
+
+If category is 'MATERIAL'.
+
+| Name | Description |
+|:----------|:--------------------|
+| SHADING | |
+| SHADING_DRAW | |
+| SHADING_LINKS | |
+| SHADING_PREVIEW | |
+
+If category is 'LAMP'.
+
+| Name | Description |
+|:----------|:--------------------|
+| LIGHTING | |
+| LIGHTING_DRAW | |
+
+If category is 'WORLD'.
+
+| Name | Description |
+|:----------|:--------------------|
+| WORLD_DRAW | |
+
+If category is 'TEXT'.
+
+| Name | Description |
+|:----------|:--------------------|
+| CURSOR | |
+| DISPLAY | |
+
+If category is 'ANIMATION'.
+
+| Name | Description |
+|:----------|:--------------------|
+| KEYFRAME | |
+| KEYFRAME_PROP | |
+| ANIMCHAN | |
+| NLA | |
+| NLA_ACTCHANGE | |
+| FCURVES_ORDER | |
+| NLA_ORDER | |
+
+If category is 'GPENCIL'.
+
+| Name | Description |
+|:----------|:--------------------|
+| GPENCIL_EDITMODE | |
+
+If category is 'GEOM'.
+
+| Name | Description |
+|:----------|:--------------------|
+| SELECT | |
+| DATA | |
+| VERTEX_GROUP | |
+
+If category is 'SPACE'.
+
+| Name | Description |
+|:----------|:--------------------|
+| SPACE_CONSOLE | |
+| SPACE_INFO_REPORT | |
+| SPACE_INFO | |
+| SPACE_IMAGE | |
+| SPACE_FILE_PARAMS | |
+| SPACE_FILE_LIST | |
+| SPACE_ASSET_PARAMS | |
+| SPACE_NODE | |
+| SPACE_OUTLINER | |
+| SPACE_VIEW3D | |
+| SPACE_PROPERTIES | |
+| SPACE_TEXT | |
+| SPACE_TIME | |
+| SPACE_GRAPH | |
+| SPACE_DOPESHEET | |
+| SPACE_NLA | |
+| SPACE_SEQUENCER | |
+| SPACE_NODE_VIEW | |
+| SPACE_CHANGED | |
+| SPACE_CLIP | |
+| SPACE_FILE_PREVIEW | |
+| SPACE_SPREADSHEET | |
+
+If category is 'ASSET'.
+
+| Name | Description |
+|:----------|:--------------------|
+| ASSET_LIST | |
+| ASSET_LIST_PREVIEW | |
+| ASSET_LIST_READING | |
+| ASSET_CATALOGS | |
