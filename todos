@@ -2,12 +2,23 @@ To-do's
 -------
 
 - Allow setting a category for the custom spaces
-- Fully replace usage of enum values with idnames.
+- Add a proper base structure for SpaceLink.
+- Replace usage of enum values with idnames where it matters (e.g. for setting space types)
+    - [ ] bAnimContext.spacetype
+    - [x] ScrArea.spacetype
+    - [x] ScrArea.butspacetype
+    - [x] SpaceLink.spacetype
+    - [ ] TransInfo.spacetype
+    - [x] wmKeyMap.spaceid
 - Expose grid view (e.g. spreadsheet) and tree view (e.g. outliner) widgets to the API
 - Drag & drop support (hard)
 - Better UIList widget, with multiple selection support (possibly via a new type)
+- Move specific space behaviors to callbacks in SpaceType.
+    - Grease Pencil
+    - Color Management
+- Expose Region/View2D/etc. properties to the RNA.
 
 Known Issues
 ------------
 
-- Saving a file with multiple custom editors after unregistering one of them messes up the data.
+- Opening a file containing an unregistered custom editor changes its type to that of the Info Editor (dev note: because area->spacedata.first is NULL when reading the blend file; behavior comes from version 2.5).
