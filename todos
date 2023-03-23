@@ -17,8 +17,13 @@ To-do's
     - Grease Pencil
     - Color Management
 - Expose Region/View2D/etc. properties to the RNA.
+- Add support for custom icons
+- Transform API ? (TransConvertTypeInfo)
+- Figure out how to set the contexts string for the panels display
 
 Known Issues
 ------------
 
 - Opening a file containing an unregistered custom editor changes its type to that of the Info Editor (dev note: because area->spacedata.first is NULL when reading the blend file; behavior comes from version 2.5).
+
+- Modifying custom editor properties does not tag the .blend file as dirty (no prompt to save on exit)
